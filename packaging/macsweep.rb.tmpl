@@ -1,0 +1,19 @@
+class Macsweep < Formula
+  desc "Recupera espaco no seu Mac: desinstala apps, limpa caches e mapeia o disco"
+  homepage "https://github.com/brunogallotte/macsweep"
+  url "https://github.com/brunogallotte/macsweep/releases/download/v__VERSION__/macsweep___VERSION___darwin_universal.tar.gz"
+  sha256 "__SHA256__"
+  license "MIT"
+  version "__VERSION__"
+
+  depends_on :macos
+
+  def install
+    bin.install "macsweep"
+    generate_completions_from_executable(bin/"macsweep", "completion")
+  end
+
+  test do
+    assert_match "macsweep", shell_output("#{bin}/macsweep --version")
+  end
+end

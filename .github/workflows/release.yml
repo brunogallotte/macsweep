@@ -1,0 +1,35 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version: stable
+
+      - uses: goreleaser/goreleaser-action@v6
+        with:
+          version: latest
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # The formula lives in a separate tap repository. A formula is used
+      # rather than a cask on purpose: Homebrew does not quarantine formula
+      # downloads, so no paid Apple Developer account is needed.
+      - name: atualizar o tap
+        env:
+          TAP_TOKEN: ${{ secrets.TAP_TOKEN }}
+        run: ./packaging/update-tap.sh "${GITHUB_REF_NAME#v}"

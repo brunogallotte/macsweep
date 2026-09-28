@@ -1,0 +1,50 @@
+version: 2
+project_name: macsweep
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: macsweep
+    main: ./cmd/macsweep
+    binary: macsweep
+    # No cgo: both slices cross compile from a single arm64 runner, which
+    # matters because GitHub's x86_64 macOS runners are being retired. The
+    # Objective-C calls macsweep needs go through purego instead.
+    env:
+      - CGO_ENABLED=0
+    goos: [darwin]
+    goarch: [amd64, arm64]
+    flags: [-trimpath]
+    ldflags:
+      - -s -w -X github.com/brunogallotte/macsweep/internal/cli.Version={{.Version}}
+
+# One universal binary means one formula url and one checksum.
+universal_binaries:
+  - id: macsweep
+    ids: [macsweep]
+    replace: true
+    # Never strip or compress after linking: it invalidates the ad hoc
+    # signature Go's linker applies, and an unsigned arm64 binary is killed
+    # on launch with no dialog to explain why.
+
+archives:
+  - id: macsweep
+    ids: [macsweep]
+    formats: [tar.gz]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_darwin_universal"
+    files: [README.md, LICENSE]
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  sort: asc
+  filters:
+    exclude: ["^docs:", "^test:", "^chore:"]
+
+release:
+  draft: false
+  footer: |
+    Instale com `brew install brunogallotte/tap/macsweep`.
