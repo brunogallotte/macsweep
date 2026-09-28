@@ -46,6 +46,11 @@ curl -fsSL https://raw.githubusercontent.com/brunogallotte/macsweep/main/install
 
 Binário universal de 5 MB, sem runtime, sem dependência. Apple Silicon e Intel.
 
+Se o `brew install` reclamar que suas Command Line Tools estão desatualizadas,
+é uma exigência do próprio Homebrew para qualquer fórmula, não do macsweep.
+Atualize pelos Ajustes do sistema, ou use o instalador via `curl` acima, que
+não depende de nada disso.
+
 ## Os quatro comandos
 
 ### `macsweep apps`
