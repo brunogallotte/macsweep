@@ -1,0 +1,4 @@
+/dist/
+/macsweep
+*.test
+.DS_Store
