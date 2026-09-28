@@ -29,7 +29,16 @@ jobs:
       # The formula lives in a separate tap repository. A formula is used
       # rather than a cask on purpose: Homebrew does not quarantine formula
       # downloads, so no paid Apple Developer account is needed.
+      # Skipped until a TAP_TOKEN secret exists, so a missing secret never
+      # fails a release. Without it, run ./packaging/update-tap.sh <version>
+      # locally after the release is published.
       - name: atualizar o tap
         env:
           TAP_TOKEN: ${{ secrets.TAP_TOKEN }}
-        run: ./packaging/update-tap.sh "${GITHUB_REF_NAME#v}"
+        run: |
+          if [ -z "$TAP_TOKEN" ]; then
+            echo "TAP_TOKEN ausente: pulando."
+            echo "rode ./packaging/update-tap.sh ${GITHUB_REF_NAME#v} localmente."
+            exit 0
+          fi
+          ./packaging/update-tap.sh "${GITHUB_REF_NAME#v}"
